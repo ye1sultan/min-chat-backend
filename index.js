@@ -8,7 +8,7 @@ const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 
 const PORT = 3000;
-const clients = new Map(); // ws -> { name: 'Bob' | 'Alice' }
+const clients = new Map();
 
 app.use(cors());
 app.use(express.json());
@@ -25,7 +25,6 @@ wss.on("connection", (ws) => {
 			const message = JSON.parse(data);
 
 			if (message.type === "login") {
-				// { type: "login", name: "Bob" }
 				clients.set(ws, { name: message.name });
 				console.log(`✅ ${message.name} logged in`);
 				return;
