@@ -1,152 +1,195 @@
-// This file contains intentionally bad code to test SonarCloud
+// This file now contains clean, properly written code
 
 const express = require('express');
 
-// Hard-coded credentials (Security Hotspot)
-const API_KEY = "sk-1234567890abcdefghijklmnopqrstuvwxyz";
-const PASSWORD = "admin123";
-const SECRET_TOKEN = "my-secret-token-12345";
+// Constants instead of magic numbers
+const PRICE_THRESHOLD = 42;
+const PI_APPROXIMATION = 3.14159;
+const DEFAULT_DIVISOR = 2.5;
+const DEFAULT_RETURN_VALUE = 100;
+const MIN_THRESHOLD = 10;
 
-// Unused variables (Code Smell)
-const unusedVariable = "This variable is never used";
-const anotherUnusedVar = 42;
-let neverUsed = [];
-
-// Function with too many parameters (Code Smell)
-function complexFunction(a, b, c, d, e, f, g, h, i, j) {
-    console.log(a + b + c + d + e + f + g + h + i + j);
+// Credentials should come from environment variables
+function getApiKey() {
+    return process.env.API_KEY || '';
 }
 
-// Dead code / Unreachable code (Code Smell)
-function deadCodeExample() {
+function getPassword() {
+    return process.env.PASSWORD || '';
+}
+
+function getSecretToken() {
+    return process.env.SECRET_TOKEN || '';
+}
+
+// Refactored function with reasonable number of parameters
+function calculateSum(numbers) {
+    return numbers.reduce((sum, num) => sum + num, 0);
+}
+
+// Removed dead code - only reachable code remains
+function validateInput() {
     return true;
-    console.log("This will never be executed");
-    let x = 5;
-    return false;
 }
 
-// Cognitive Complexity - Deeply nested conditions (Code Smell)
-function complexLogic(x, y, z) {
-    if (x > 0) {
-        if (y > 0) {
-            if (z > 0) {
-                if (x > y) {
-                    if (y > z) {
-                        if (x > z) {
-                            return "very complex";
-                        }
-                    }
-                }
-            }
-        }
+// Simplified logic with reduced cognitive complexity
+function categorizeValue(x, y, z) {
+    if (x <= 0 || y <= 0 || z <= 0) {
+        return "simple";
     }
-    return "simple";
+    
+    const isValid = x > y && y > z && x > z;
+    return isValid ? "very complex" : "simple";
 }
 
-// Code duplication (Code Smell)
-function calculatePrice1(items) {
-    let total = 0;
-    for (let i = 0; i < items.length; i++) {
-        total += items[i].price * items[i].quantity;
+// Single reusable function instead of duplicates
+function calculateTotalPrice(items) {
+    if (!items || !Array.isArray(items)) {
+        return 0;
     }
-    return total;
+    
+    return items.reduce((total, item) => {
+        const price = item.price || 0;
+        const quantity = item.quantity || 0;
+        return total + (price * quantity);
+    }, 0);
 }
 
-function calculatePrice2(products) {
-    let total = 0;
-    for (let i = 0; i < products.length; i++) {
-        total += products[i].price * products[i].quantity;
-    }
-    return total;
-}
-
-function calculatePrice3(goods) {
-    let total = 0;
-    for (let i = 0; i < goods.length; i++) {
-        total += goods[i].price * goods[i].quantity;
-    }
-    return total;
-}
-
-// == instead of === (Code Smell)
+// Using strict equality
 function compareValues(a, b) {
-    if (a == b) {  // Should use ===
-        return true;
+    return a === b;
+}
+
+// Safe alternative to eval - using Function constructor with validation
+function safeEvaluate(expression) {
+    // Only allow simple mathematical expressions
+    const safePattern = /^[0-9+\-*/().\s]+$/;
+    
+    if (!safePattern.test(expression)) {
+        throw new Error('Invalid expression');
     }
-    return false;
+    
+    try {
+        // Using Function is safer than eval but still should be avoided in production
+        // Consider using a proper expression parser library
+        return new Function(`'use strict'; return (${expression})`)();
+    } catch (error) {
+        throw new Error('Evaluation failed');
+    }
 }
 
-// eval() usage (Security Vulnerability)
-function dangerousEval(userInput) {
-    return eval(userInput);  // Critical security issue
-}
-
-// SQL Injection vulnerability potential
+// Using parameterized queries (example with prepared statement pattern)
 function getUserData(userId) {
-    const query = "SELECT * FROM users WHERE id = " + userId;  // SQL injection risk
-    console.log(query);
+    // This would use a proper database library with parameterized queries
+    // Example: const query = 'SELECT * FROM users WHERE id = ?';
+    // return db.query(query, [userId]);
+    
+    if (!userId || typeof userId !== 'number') {
+        throw new Error('Invalid user ID');
+    }
+    
+    // Return a safe query structure instead of concatenating
+    return {
+        query: 'SELECT * FROM users WHERE id = ?',
+        params: [userId]
+    };
 }
 
-// Missing error handling (Code Smell)
+// Proper error handling
 function parseJSON(data) {
-    return JSON.parse(data);  // No try-catch
+    try {
+        return JSON.parse(data);
+    } catch (error) {
+        throw new Error(`Failed to parse JSON: ${error.message}`);
+    }
 }
 
-// Console.log in production code (Code Smell)
-function debugFunction() {
-    console.log("Debug: Function called");
-    console.log("Debug: Processing data");
-    console.error("Error log");
-    console.warn("Warning log");
+// Using proper logger instead of console (in production, use winston/bunyan)
+function logDebug(message) {
+    // In production, replace with proper logging library
+    if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.log(message);
+    }
 }
 
-// Variable shadowing (Code Smell)
-let globalVar = "global";
-function shadowExample() {
-    let globalVar = "local";  // Shadows outer variable
-    console.log(globalVar);
+// No variable shadowing
+const globalConfiguration = "global";
+
+function getConfiguration() {
+    const localConfiguration = "local";
+    return localConfiguration;
 }
 
-// Empty block (Code Smell)
-function emptyBlock(x) {
+// Non-empty block with meaningful logic
+function processPositiveNumber(x) {
     if (x > 0) {
-        // Empty if block
+        return x * 2;
     }
+    return 0;
 }
 
-// Identical if/else branches (Code Smell)
-function identicalBranches(x) {
+// Different branches with distinct behavior
+function categorizeNumber(x) {
     if (x > 0) {
-        return "value";
-    } else {
-        return "value";  // Same as if branch
+        return "positive";
     }
+    return "non-positive";
 }
 
-// Magic numbers everywhere (Code Smell)
-function magicNumbers(x) {
-    if (x > 42) {
-        return x * 3.14159;
-    } else if (x < 10) {
-        return x / 2.5;
+// Using named constants
+function calculateValue(x) {
+    if (x > PRICE_THRESHOLD) {
+        return x * PI_APPROXIMATION;
     }
-    return 100;
+    
+    if (x < MIN_THRESHOLD) {
+        return x / DEFAULT_DIVISOR;
+    }
+    
+    return DEFAULT_RETURN_VALUE;
 }
 
-// No input validation
+// Input validation
 function processUserInput(input) {
-    return input.toUpperCase();  // No null/undefined check
+    if (input === null || input === undefined) {
+        throw new Error('Input cannot be null or undefined');
+    }
+    
+    if (typeof input !== 'string') {
+        throw new Error('Input must be a string');
+    }
+    
+    return input.toUpperCase();
 }
 
-// Overly complex boolean expression
-function complexBoolean(a, b, c, d) {
-    return (a && b || c && d || !a && !b || a && !c && d || !a && b && !d);
+// Simplified boolean expression
+function evaluateConditions(a, b, c, d) {
+    const condition1 = (a && b) || (c && d);
+    const condition2 = (!a && !b) || (a && !c && d);
+    const condition3 = !a && b && !d;
+    
+    return condition1 || condition2 || condition3;
 }
 
-// Export to make it a "used" file
+// Export functions
 module.exports = {
-    complexFunction,
-    deadCodeExample,
-    dangerousEval
+    calculateSum,
+    validateInput,
+    categorizeValue,
+    calculateTotalPrice,
+    compareValues,
+    safeEvaluate,
+    getUserData,
+    parseJSON,
+    logDebug,
+    getConfiguration,
+    processPositiveNumber,
+    categorizeNumber,
+    calculateValue,
+    processUserInput,
+    evaluateConditions,
+    getApiKey,
+    getPassword,
+    getSecretToken
 };
-
