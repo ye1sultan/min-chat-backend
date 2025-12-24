@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for better analysis
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -32,3 +34,4 @@ jobs:
           args: >
             -Dsonar.projectKey=ye1sultan_min-chat-backend
             -Dsonar.organization=ye1sultan
+            -Dsonar.qualitygate.wait=true
